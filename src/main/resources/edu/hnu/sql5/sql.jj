@@ -1,0 +1,112 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  STATIC = true;
+  IGNORE_CASE = true;
+}
+/*
+ *2022.06.05
+ 	检测用户的输入是否为: Create Table;
+ 	可以忽略空格
+ *2022.06.05
+ 	用户的输入可以为 Create Table 表名;
+ 	其中表名为一个标识符
+ *2022.06.06
+ 	输出表名
+ *2022.06.06
+ 	可以输入一个字段名和属性
+*/
+PARSER_BEGIN(sql)
+package edu.hnu.sql5;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+public class sql
+{
+  public static void main(String args []) throws ParseException
+  {
+    System.out.println("SQL Parse...");
+   	
+    try
+    {
+    	FileReader Fr = new FileReader("0005-2.txt"); 
+   		new sql(Fr);
+        sql.ParseSQL();      
+    }
+    catch (Exception e)
+    {
+      	System.out.println(e.getMessage());
+    }
+  }
+}
+
+PARSER_END(sql)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /*关键字*/
+{
+  < CREATE : "create" >
+| < TABLE : "table" >
+| < INT: "int" >
+| < FLOAT:"float" >
+| < STRING:"string" >
+}
+
+TOKEN: /*分隔符*/
+{
+  < SEMICOLON : ";" >
+| < BLBRACE : "{" >
+| < BRBRACE : "}" >
+| < LBRACE : "(" >
+| < RBRACE : ")" >
+| < COMMA : "," >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER :
+    < LETTER >
+    (
+      < LETTER >
+    | < DIGIT >
+    )* >
+| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >
+| < #DIGIT : [ "0"-"9" ] >
+}
+
+void ParseSQL() :
+{
+  Token t;
+}
+{
+	< CREATE >  <TABLE >
+	t=<IDENTIFIER >
+	{
+		System.out.println("需要创建的表名为："+t.image);
+	}
+	< LBRACE >
+	ColumnDef()
+	( <COMMA > ColumnDef())*
+	< RBRACE >
+	<SEMICOLON >
+}
+
+void ColumnDef():
+{
+}
+{
+ < IDENTIFIER >
+ (
+	< INT >
+|   < FLOAT >
+|   < STRING > 
+ )
+}
